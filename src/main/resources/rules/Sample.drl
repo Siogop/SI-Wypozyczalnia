@@ -1,0 +1,50 @@
+package Sample;
+
+import com.sample.*;
+
+rule "Init"
+    when
+    then
+        Samochod s1 = new Samochod(Kategoria.A);
+        Samochod s2 = new Samochod(Kategoria.A);
+        Samochod s3 = new Samochod(Kategoria.B);
+        Samochod s4 = new Samochod(Kategoria.D);
+        Samochod s5 = new Samochod(Kategoria.D);
+        
+        insert(s1);
+        insert(s2);
+        insert(s3);
+        insert(s4);
+        insert(s5);
+        
+end
+
+rule "ee"
+	when
+		exists Klient();
+	then
+		System.out.println("aa");
+	end
+
+rule "ZgloszenieCheciWynajmu"
+    //include attributes such as "salience" here...
+    when
+    	r1: Rezerwacja();
+        s1: Samochod (!Samochod.isWypozyczony())
+    	not(exists Rezerwacja(getKlient() == r1.getKlient))
+    then
+    	System.out.println("Samochód" + s1.getKategoria() + "wypo¿yczony dla " + r1.getKlient());
+        s1.setWypozyczony(true);
+        r1.setSamochod(s1);
+end
+
+rule "ZgloszenieCheciNiemozliwegoWynajmu"
+    //include attributes such as "salience" here...
+    when
+    	r1: Rezerwacja();
+        not(exists Samochod (!Samochod.isWypozyczony())) 
+    	or (exists Rezerwacja(getKlient() == r1.getKlient))
+    then
+		System.out.println("Wynajem niemo¿liwy");
+		retract(r1);
+end
